@@ -1,8 +1,9 @@
 package app
 
 import (
-	"hawk/pkg/session"
 	"strconv"
+
+	"github.com/saifsabir97/pcap-analyser/pkg/session"
 )
 
 func (c *Client) Run() [][]string {

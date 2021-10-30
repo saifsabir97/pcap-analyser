@@ -1,6 +1,6 @@
 package app
 
-import "hawk/pkg/session"
+import "github.com/saifsabir97/pcap-analyser/pkg/session"
 
 type SessionDetails struct {
 	Session session.Session `json:"session"`

@@ -1,4 +1,4 @@
-module hawk
+module github.com/saifsabir97/pcap-analyser
 
 go 1.15
 
