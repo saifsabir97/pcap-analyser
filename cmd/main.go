@@ -11,5 +11,5 @@ func main() {
 		panic("unable to create analyser client")
 	}
 	sessionDetailsMatrix := analyser.Run()
-	csv.CreateCSV(sessionDetailsMatrix, "results.csv")
+	csv.CreateCSV(sessionDetailsMatrix, "data/results.csv")
 }

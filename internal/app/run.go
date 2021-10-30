@@ -32,8 +32,8 @@ func transformSessionToMatrix(sessions []SessionDetails) [][]string {
 	var matrix [][]string
 	matrix = append(
 		matrix,
-		[]string{"Source IP", "Destination IP",
-			"Source Port", "Destination Port",
+		[]string{"Client 1 IP", "Client 2 IP",
+			"Client 1 Port", "Client 2 Port",
 			"Protocol", "Total Packets Transferred",
 			"Start Time", "End Time",
 			"Data Transferred (in Bytes)",
@@ -42,8 +42,8 @@ func transformSessionToMatrix(sessions []SessionDetails) [][]string {
 	for _, currentSessionDetails := range sessions {
 		matrix = append(
 			matrix,
-			[]string{currentSessionDetails.Session.SourceIP, currentSessionDetails.Session.DestinationIP,
-				currentSessionDetails.Session.SourcePort, currentSessionDetails.Session.DestinationPort,
+			[]string{currentSessionDetails.Session.Client1IP, currentSessionDetails.Session.Client2IP,
+				currentSessionDetails.Session.Client1Port, currentSessionDetails.Session.Client2Port,
 				currentSessionDetails.Session.Protocol, strconv.Itoa(currentSessionDetails.Metrics.TotalPackets),
 				currentSessionDetails.Metrics.StartTime.String(), currentSessionDetails.Metrics.EndTime.String(),
 				strconv.Itoa(currentSessionDetails.Metrics.TotalData),

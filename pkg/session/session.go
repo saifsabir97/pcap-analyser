@@ -8,18 +8,18 @@ import (
 )
 
 type Session struct {
-	SourceIP        string `json:"source_ip"`
-	DestinationIP   string `json:"destination_ip"`
-	SourcePort      string `json:"source_port"`
-	DestinationPort string `json:"destination_port"`
-	Protocol        string `json:"protocol"`
+	Client1IP   string
+	Client2IP   string
+	Client1Port string
+	Client2Port string
+	Protocol    string
 }
 
 type Metrics struct {
-	TotalPackets int       `json:"total_packets"`
-	TotalData    int       `json:"total_data"`
-	StartTime    time.Time `json:"start_time"`
-	EndTime      time.Time `json:"end_time"`
+	TotalPackets int
+	TotalData    int
+	StartTime    time.Time
+	EndTime      time.Time
 }
 
 func NewSession(packet gopacket.Packet) (*Session, error) {
@@ -27,11 +27,11 @@ func NewSession(packet gopacket.Packet) (*Session, error) {
 		return nil, errors.New("unknown protocol")
 	}
 	return &Session{
-		SourceIP:        packet.NetworkLayer().NetworkFlow().Src().String(),
-		DestinationIP:   packet.NetworkLayer().NetworkFlow().Dst().String(),
-		SourcePort:      packet.TransportLayer().TransportFlow().Src().String(),
-		DestinationPort: packet.TransportLayer().TransportFlow().Dst().String(),
-		Protocol:        packet.TransportLayer().LayerType().String(),
+		Client1IP:   packet.NetworkLayer().NetworkFlow().Src().String(),
+		Client2IP:   packet.NetworkLayer().NetworkFlow().Dst().String(),
+		Client1Port: packet.TransportLayer().TransportFlow().Src().String(),
+		Client2Port: packet.TransportLayer().TransportFlow().Dst().String(),
+		Protocol:    packet.TransportLayer().LayerType().String(),
 	}, nil
 }
 
@@ -44,11 +44,11 @@ func GetSessionMetrics(sessionStream map[Session]*Metrics, currentSession Sessio
 		return currentSession, sessionMetrics
 	}
 	mateSession := Session{
-		SourceIP:        currentSession.DestinationIP,
-		DestinationIP:   currentSession.SourceIP,
-		SourcePort:      currentSession.DestinationPort,
-		DestinationPort: currentSession.SourcePort,
-		Protocol:        currentSession.Protocol,
+		Client1IP:   currentSession.Client2IP,
+		Client2IP:   currentSession.Client1IP,
+		Client1Port: currentSession.Client2Port,
+		Client2Port: currentSession.Client1Port,
+		Protocol:    currentSession.Protocol,
 	}
 	sessionMetrics, present = sessionStream[mateSession]
 	if present {
