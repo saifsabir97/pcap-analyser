@@ -35,28 +35,37 @@ func NewSession(packet gopacket.Packet) (*Session, error) {
 	}, nil
 }
 
-func GetSessionMetrics(sessionStream map[Session]*Metrics, currentSession Session, packetTimestamp time.Time, packetLength int) (Session, *Metrics) {
-	sessionMetrics, present := sessionStream[currentSession]
-	if present {
-		sessionMetrics.EndTime = packetTimestamp
-		sessionMetrics.TotalPackets += 1
-		sessionMetrics.TotalData += packetLength
-		return currentSession, sessionMetrics
+func GetSessionMetrics(sessionStream map[Session]*Metrics, packet gopacket.Packet) (*Session, *Metrics, error) {
+	currentSession, err := NewSession(packet)
+	if err != nil {
+		return nil, nil, err
 	}
-	mateSession := Session{
+	sessionMetrics, present := sessionStream[*currentSession]
+	if present {
+		sessionMetrics.EndTime = packet.Metadata().Timestamp
+		sessionMetrics.TotalPackets += 1
+		sessionMetrics.TotalData += packet.Metadata().Length
+		return currentSession, sessionMetrics, nil
+	}
+	mateSession := &Session{
 		Client1IP:   currentSession.Client2IP,
 		Client2IP:   currentSession.Client1IP,
 		Client1Port: currentSession.Client2Port,
 		Client2Port: currentSession.Client1Port,
 		Protocol:    currentSession.Protocol,
 	}
-	sessionMetrics, present = sessionStream[mateSession]
+	sessionMetrics, present = sessionStream[*mateSession]
 	if present {
-		sessionMetrics.EndTime = packetTimestamp
+		sessionMetrics.EndTime = packet.Metadata().Timestamp
 		sessionMetrics.TotalPackets += 1
-		sessionMetrics.TotalData += packetLength
-		return mateSession, sessionMetrics
+		sessionMetrics.TotalData += packet.Metadata().Length
+		return mateSession, sessionMetrics, nil
 	} else {
-		return currentSession, &Metrics{TotalPackets: 1, StartTime: packetTimestamp, EndTime: packetTimestamp, TotalData: packetLength}
+		return currentSession, &Metrics{
+			TotalPackets: 1,
+			StartTime:    packet.Metadata().Timestamp,
+			EndTime:      packet.Metadata().Timestamp,
+			TotalData:    packet.Metadata().Length,
+		}, nil
 	}
 }

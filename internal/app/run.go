@@ -9,14 +9,17 @@ import (
 func (c *Client) Run() [][]string {
 	sessionStream := map[session.Session]*session.Metrics{}
 	for packet := range c.packetSource.Packets() {
-		currentSession, err := session.NewSession(packet)
+		actualSession, metrics, err := session.GetSessionMetrics(sessionStream, packet)
 		if err != nil {
 			continue
 		}
-		actualSession, metrics := session.GetSessionMetrics(sessionStream, *currentSession,
-			packet.Metadata().Timestamp, packet.Metadata().CaptureLength)
-		sessionStream[actualSession] = metrics
+		sessionStream[*actualSession] = metrics
 	}
+	sessionDetails := getSessionDetails(sessionStream)
+	return transformSessionDetailsToMatrix(sessionDetails)
+}
+
+func getSessionDetails(sessionStream map[session.Session]*session.Metrics) []SessionDetails {
 	var sessions []SessionDetails
 	for currentSession, metric := range sessionStream {
 		currentSessionDetails := SessionDetails{
@@ -25,10 +28,10 @@ func (c *Client) Run() [][]string {
 		}
 		sessions = append(sessions, currentSessionDetails)
 	}
-	return transformSessionToMatrix(sessions)
+	return sessions
 }
 
-func transformSessionToMatrix(sessions []SessionDetails) [][]string {
+func transformSessionDetailsToMatrix(sessions []SessionDetails) [][]string {
 	var matrix [][]string
 	matrix = append(
 		matrix,
