@@ -17,6 +17,7 @@ type Session struct {
 
 type Metrics struct {
 	TotalPackets int       `json:"total_packets"`
+	TotalData    int       `json:"total_data"`
 	StartTime    time.Time `json:"start_time"`
 	EndTime      time.Time `json:"end_time"`
 }
@@ -34,11 +35,12 @@ func NewSession(packet gopacket.Packet) (*Session, error) {
 	}, nil
 }
 
-func GetSessionMetrics(sessionStream map[Session]*Metrics, currentSession Session, packetTimestamp time.Time) (Session, *Metrics) {
+func GetSessionMetrics(sessionStream map[Session]*Metrics, currentSession Session, packetTimestamp time.Time, packetLength int) (Session, *Metrics) {
 	sessionMetrics, present := sessionStream[currentSession]
 	if present {
 		sessionMetrics.EndTime = packetTimestamp
 		sessionMetrics.TotalPackets += 1
+		sessionMetrics.TotalData += packetLength
 		return currentSession, sessionMetrics
 	}
 	mateSession := Session{
@@ -52,8 +54,9 @@ func GetSessionMetrics(sessionStream map[Session]*Metrics, currentSession Sessio
 	if present {
 		sessionMetrics.EndTime = packetTimestamp
 		sessionMetrics.TotalPackets += 1
+		sessionMetrics.TotalData += packetLength
 		return mateSession, sessionMetrics
 	} else {
-		return currentSession, &Metrics{TotalPackets: 1, StartTime: packetTimestamp, EndTime: packetTimestamp}
+		return currentSession, &Metrics{TotalPackets: 1, StartTime: packetTimestamp, EndTime: packetTimestamp, TotalData: packetLength}
 	}
 }

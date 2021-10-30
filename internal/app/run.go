@@ -13,7 +13,8 @@ func (c *Client) Run() [][]string {
 		if err != nil {
 			continue
 		}
-		actualSession, metrics := session.GetSessionMetrics(sessionStream, *currentSession, packet.Metadata().Timestamp)
+		actualSession, metrics := session.GetSessionMetrics(sessionStream, *currentSession,
+			packet.Metadata().Timestamp, packet.Metadata().CaptureLength)
 		sessionStream[actualSession] = metrics
 	}
 	var sessions []SessionDetails
@@ -35,6 +36,7 @@ func transformSessionToMatrix(sessions []SessionDetails) [][]string {
 			"Source Port", "Destination Port",
 			"Protocol", "Total Packets Transferred",
 			"Start Time", "End Time",
+			"Data Transferred (in Bytes)",
 		},
 	)
 	for _, currentSessionDetails := range sessions {
@@ -44,6 +46,7 @@ func transformSessionToMatrix(sessions []SessionDetails) [][]string {
 				currentSessionDetails.Session.SourcePort, currentSessionDetails.Session.DestinationPort,
 				currentSessionDetails.Session.Protocol, strconv.Itoa(currentSessionDetails.Metrics.TotalPackets),
 				currentSessionDetails.Metrics.StartTime.String(), currentSessionDetails.Metrics.EndTime.String(),
+				strconv.Itoa(currentSessionDetails.Metrics.TotalData),
 			},
 		)
 	}
