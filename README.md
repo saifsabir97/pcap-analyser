@@ -9,4 +9,4 @@ Parse pcap files and give metrics regarding individual sessions as CSV file.
 
 
 ## Example results:
-![Sample csv output](/screenshots/Screenshot%2F2021-11-0%2Fat%2F2.43.13%2FPM.png?raw=true "Optional Title")
+![Sample csv output](/screenshots/sample-output.png?raw=true "Optional Title")
